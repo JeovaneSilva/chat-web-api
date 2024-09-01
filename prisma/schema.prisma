@@ -14,28 +14,28 @@ generator client {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  name      String         @unique
-  email         String         @unique
-  password      String
-  isOnline      Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id             Int            @id @default(autoincrement())
+  name           String         @unique
+  email          String         @unique
+  password       String
+  isOnline       Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   conversations1 Conversation[] @relation("User1Conversations")
   conversations2 Conversation[] @relation("User2Conversations")
-  messages      Message[]      @relation("UserMessages")
-  status        UserStatus?    // Relação opcional com UserStatus
+  messages       Message[]      @relation("UserMessages")
+  status         UserStatus? // Relação opcional com UserStatus
 }
 
 model Conversation {
-  id           Int       @id @default(autoincrement())
-  user1        User      @relation("User1Conversations", fields: [user1Id], references: [id])
-  user1Id      Int
-  user2        User      @relation("User2Conversations", fields: [user2Id], references: [id])
-  user2Id      Int
-  messages     Message[] @relation("ConversationMessages")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  user1     User      @relation("User1Conversations", fields: [user1Id], references: [id])
+  user1Id   Int
+  user2     User      @relation("User2Conversations", fields: [user2Id], references: [id])
+  user2Id   Int
+  messages  Message[] @relation("ConversationMessages")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Message {
@@ -49,10 +49,10 @@ model Message {
 }
 
 model UserStatus {
-  id          Int       @id @default(autoincrement())
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int       @unique
-  isOnline    Boolean   @default(false)
-  lastSeen    DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  isOnline  Boolean  @default(false)
+  lastSeen  DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
