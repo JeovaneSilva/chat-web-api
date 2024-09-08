@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, NotFoundException } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
 
-@Controller('conversation')
+@Controller('conversations')
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 
-  @Post()
-  create(@Body() createConversationDto: CreateConversationDto) {
-    return this.conversationService.create(createConversationDto);
+  // Endpoint para criar uma conversa
+  @Post('create')
+  async createConversation(
+    @Body('user1Id') user1Id: number,
+    @Body('user2Id') user2Id: number,
+  ) {
+    return this.conversationService.createConversation(user1Id, user2Id);
   }
 
+  // Endpoint para buscar todas as conversas
   @Get()
   findAll() {
     return this.conversationService.findAll();
   }
 
+  // Endpoint para buscar conversas de um usuário específico
+  @Get('user')
+  async getConversationsByUser(@Query('userId') userId: number) {
+    const conversations = await this.conversationService.getConversationsByUserId(userId);
+    if (!conversations.length) {
+      throw new NotFoundException('Nenhuma conversa encontrada para este usuário');
+    }
+    return conversations;
+  }
+
+  // Endpoint para buscar uma conversa específica
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.conversationService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateConversationDto: UpdateConversationDto) {
-    return this.conversationService.update(+id, updateConversationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.conversationService.remove(+id);
   }
 }

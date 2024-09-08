@@ -1,98 +1,61 @@
 import { Injectable } from '@nestjs/common';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ConversationService {
   constructor(private prisma: PrismaService) {}
 
-  create(createConversationDto: CreateConversationDto) {
-    return this.prisma.conversation.create({ data: createConversationDto });
+  // Cria uma nova conversa entre dois usuários
+  async createConversation(user1Id: number, user2Id: number) {
+    return this.prisma.conversation.create({
+      data: {
+        user1: { connect: { id: user1Id } },
+        user2: { connect: { id: user2Id } },
+      },
+    });
   }
 
+  // Buscar todas as conversas com detalhes dos usuários e mensagens
   findAll() {
     return this.prisma.conversation.findMany({
       include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        messages: {
-          select: {
-            id: true,
-            content: true,
-            sender: {
-              select: {
-                id:true,
-                name: true,
-                email: true,
-              },
-            },
-            createdAt: true,
-          },
-          orderBy: {
-            createdAt: 'asc'
-          },
-        },
+        user1: true,
+        user2: true,
+        messages: true,
       },
     });
   }
 
+  // Buscar conversas pelo ID do usuário
+  async getConversationsByUserId(userId: number) {
+    return this.prisma.conversation.findMany({
+      where: {
+        OR: [{ user1Id: userId }, { user2Id: userId }],
+      },
+      include: {
+        user1: true,
+        user2: true,
+      },
+    });
+  }
+
+  // Buscar uma conversa específica pelo ID
   findOne(id: number) {
     return this.prisma.conversation.findUnique({
-      where: {id},
+      where: { id },
       include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        messages: {
-          select: {
-            id: true,
-            content: true,
-            sender: {
-              select: {
-                id:true,
-                name: true,
-                email: true,
-              },
-            },
-            createdAt: true,
-          },
-          orderBy: {
-            createdAt: 'asc'
-          },
-        },
+        user1: true,
+        user2: true,
+        messages: true,
       },
     });
   }
 
-  update(id: number, updateConversationDto: UpdateConversationDto) {
-    return `This action updates a #${id} conversation`;
+  update(id: number) {
+    // Implementação da lógica de atualização se necessário
   }
 
   remove(id: number) {
-    return `This action removes a #${id} conversation`;
+    // Implementação da lógica de remoção se necessário
   }
 }
