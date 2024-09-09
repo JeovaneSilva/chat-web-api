@@ -26,11 +26,14 @@ export class ConversationService {
     });
   }
 
-  // Buscar conversas pelo ID do usuário
   async getConversationsByUserId(userId: number) {
+    const parsedUserId = Number(userId); // Converter para número, se necessário
     return this.prisma.conversation.findMany({
       where: {
-        OR: [{ user1Id: userId }, { user2Id: userId }],
+        OR: [
+          { user1Id: parsedUserId },
+          { user2Id: parsedUserId },
+        ],
       },
       include: {
         user1: true,
