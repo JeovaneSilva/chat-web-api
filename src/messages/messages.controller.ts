@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, NotFoundException, UseGuards } from '@nestjs/common';
 import { MessagesService } from './messages.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
-  // Endpoint para criar uma nova mensagem
+  @UseGuards(AuthGuard)
   @Post('create')
   async createMessage(
     @Body() createMessageDto: { content: string; senderId: number; conversationId: number },
@@ -13,7 +14,7 @@ export class MessagesController {
     return this.messagesService.createMessage(createMessageDto);
   }
 
-  // Endpoint para buscar mensagens de uma conversa específica
+  @UseGuards(AuthGuard)
   @Get('conversation')
   async getMessagesByConversation(@Query('conversationId') conversationId: string) {
     const conversationIdNumber = parseInt(conversationId, 10);

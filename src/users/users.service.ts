@@ -17,7 +17,6 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  // Buscar usuário pelo ID
   async getUserById(id: number) {
     return this.prisma.user.findUnique({
       where: { id },

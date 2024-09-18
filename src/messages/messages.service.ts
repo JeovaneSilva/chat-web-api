@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class MessagesService {
   constructor(private prisma: PrismaService) {}
 
-  // Criar uma nova mensagem
   async createMessage(createMessageDto: {
     content: string;
     senderId: number;
@@ -16,7 +15,6 @@ export class MessagesService {
     });
   }
 
-  // Buscar mensagens de uma conversa específica
   async getMessagesByConversationId(conversationId: number) {
     return this.prisma.message.findMany({
       where: { conversationId },
@@ -25,10 +23,10 @@ export class MessagesService {
   }
 
   update(id: number) {
-    // Implementação da lógica de atualização se necessário
+    
   }
 
   remove(id: number) {
-    // Implementação da lógica de remoção se necessário
+   
   }
 }

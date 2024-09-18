@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ConversationService {
   constructor(private prisma: PrismaService) {}
 
-  // Cria uma nova conversa entre dois usuários
   async createConversation(user1Id: number, user2Id: number) {
     return this.prisma.conversation.create({
       data: {
@@ -15,7 +14,6 @@ export class ConversationService {
     });
   }
 
-  // Buscar todas as conversas com detalhes dos usuários e mensagens
   findAll() {
     return this.prisma.conversation.findMany({
       include: {
@@ -27,7 +25,7 @@ export class ConversationService {
   }
 
   async getConversationsByUserId(userId: number) {
-    const parsedUserId = Number(userId); // Converter para número, se necessário
+    const parsedUserId = Number(userId);
     return this.prisma.conversation.findMany({
       where: {
         OR: [
@@ -42,7 +40,6 @@ export class ConversationService {
     });
   }
 
-  // Buscar uma conversa específica pelo ID
   findOne(id: number) {
     return this.prisma.conversation.findUnique({
       where: { id },
@@ -55,10 +52,10 @@ export class ConversationService {
   }
 
   update(id: number) {
-    // Implementação da lógica de atualização se necessário
+    
   }
 
   remove(id: number) {
-    // Implementação da lógica de remoção se necessário
+    
   }
 }

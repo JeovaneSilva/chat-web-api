@@ -23,10 +23,9 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(@MessageBody() payload: { content: string; senderId: number; conversationId: number }) {
-    // Salvar a mensagem no banco de dados
+ 
     const newMessage = await this.messagesService.createMessage(payload);
 
-    // Emitir a nova mensagem para todos os clientes conectados
     this.server.emit('message', newMessage);
 
     return newMessage;

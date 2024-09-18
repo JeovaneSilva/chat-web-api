@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Query, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, NotFoundException, UseGuards } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('conversations')
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 
-  // Endpoint para criar uma conversa
+  @UseGuards(AuthGuard)
   @Post('create')
   async createConversation(
     @Body('user1Id') user1Id: number,
@@ -14,13 +15,13 @@ export class ConversationController {
     return this.conversationService.createConversation(user1Id, user2Id);
   }
 
-  // Endpoint para buscar todas as conversas
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.conversationService.findAll();
   }
 
-  // Endpoint para buscar conversas de um usuário específico
+  @UseGuards(AuthGuard)
   @Get('user')
   async getConversationsByUser(@Query('userId') userId: number) {
     const conversations = await this.conversationService.getConversationsByUserId(userId);
@@ -30,7 +31,7 @@ export class ConversationController {
     return conversations;
   }
 
-  // Endpoint para buscar uma conversa específica
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.conversationService.findOne(+id);

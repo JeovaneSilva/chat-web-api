@@ -24,7 +24,7 @@ model User {
   conversations1 Conversation[] @relation("User1Conversations")
   conversations2 Conversation[] @relation("User2Conversations")
   messages       Message[]      @relation("UserMessages")
-  status         UserStatus? // Relação opcional com UserStatus
+  status         UserStatus?
 }
 
 model Conversation {
