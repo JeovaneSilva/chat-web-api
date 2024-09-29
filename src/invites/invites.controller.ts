@@ -1,3 +1,5 @@
+// invites.controller.ts
+
 import { Controller, Post, Body, Param, Get, UseGuards } from '@nestjs/common';
 import { InvitesService } from './invites.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -15,31 +17,22 @@ export class InvitesController {
     return this.invitesService.sendInvite(senderId, receiverId);
   }
 
-  // Rota para aceitar um convite de amizade
   @UseGuards(AuthGuard)
   @Post('accept/:id')
-  async acceptInvite(@Param('id') inviteId: number) {
+  async acceptInvite(@Param('id') inviteId: string) {
     return this.invitesService.acceptInvite(inviteId);
   }
 
-  // Rota para recusar um convite de amizade
   @UseGuards(AuthGuard)
   @Post('decline/:id')
-  async declineInvite(@Param('id') inviteId: number) {
+  async declineInvite(@Param('id') inviteId: string) {
     return this.invitesService.declineInvite(inviteId);
   }
 
-  // Rota para listar convites recebidos
+  // Rota para listar convites enviados e recebidos
   @UseGuards(AuthGuard)
-  @Get('received/:userId')
-  async getReceivedInvites(@Param('userId') userId: number) {
-    return this.invitesService.getReceivedInvites(userId);
-  }
-
-  // Rota para listar convites enviados
-  @UseGuards(AuthGuard)
-  @Get('sent/:userId')
-  async getSentInvites(@Param('userId') userId: number) {
-    return this.invitesService.getSentInvites(userId);
+  @Get('all/:userId')
+  async getInvites(@Param('userId') userId: string) {
+    return this.invitesService.getInvites(Number(userId));
   }
 }

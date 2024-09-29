@@ -18,38 +18,40 @@ export class InvitesService {
   }
 
   // Aceitar um convite de amizade
-  async acceptInvite(inviteId: number) {
+  async acceptInvite(inviteId: string) {
     return this.prisma.invite.update({
-      where: { id: inviteId },
+      where: { id: Number(inviteId) },
       data: { status: InviteStatus.ACCEPTED },
     });
   }
 
   // Recusar um convite de amizade
-  async declineInvite(inviteId: number) {
+  async declineInvite(inviteId: string) {
     return this.prisma.invite.update({
-      where: { id: inviteId },
+      where: { id: Number(inviteId) },
       data: { status: InviteStatus.DECLINED },
     });
   }
-
-  // Listar convites recebidos por um usuário
-  async getReceivedInvites(userId: number) {
-    return this.prisma.invite.findMany({
-      where: { receiverId: userId, status: InviteStatus.PENDING },
-      include: {
-        sender: true, // Para incluir detalhes do remetente
-      },
-    });
-  }
-
-  // Listar convites enviados por um usuário
-  async getSentInvites(userId: number) {
-    return this.prisma.invite.findMany({
+  // Obter tanto os convites enviados quanto os recebidos por um usuário
+  async getInvites(userId: number) {
+    const sentInvites = await this.prisma.invite.findMany({
       where: { senderId: userId },
       include: {
-        receiver: true, // Para incluir detalhes do destinatário
+        receiver: true, // Inclui detalhes do destinatário
       },
     });
+
+    const receivedInvites = await this.prisma.invite.findMany({
+      where: { receiverId: userId },
+      include: {
+        sender: true, // Inclui detalhes do remetente
+      },
+    });
+
+    return {
+      sentInvites,
+      receivedInvites,
+    };
   }
+  
 }
