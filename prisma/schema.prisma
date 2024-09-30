@@ -12,6 +12,7 @@ model User {
   name           String         @unique
   email          String         @unique
   password       String
+  profilePicture String?        // Adicionado para armazenar a foto de perfil
   isOnline       Boolean        @default(false)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -19,7 +20,7 @@ model User {
   conversations2 Conversation[] @relation("User2Conversations")
   messages       Message[]      @relation("UserMessages")
   status         UserStatus?
-   sentInvites    Invite[]       @relation("UserSentInvites")
+  sentInvites    Invite[]       @relation("UserSentInvites")
   receivedInvites Invite[]      @relation("UserReceivedInvites")
 }
 

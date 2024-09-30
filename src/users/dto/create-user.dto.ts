@@ -4,6 +4,7 @@ export class CreateUserDto {
     email:string  
     password: string
     isOnline: boolean
+    profilePicture?:string
     
 
 }

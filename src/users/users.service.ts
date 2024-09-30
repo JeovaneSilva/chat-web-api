@@ -10,7 +10,11 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     const hashPassword = await bcrypt.hash(data.password, 10);
-    return await this.prisma.user.create({data: {...data,password:hashPassword}});
+
+    // Salvando o caminho da foto de perfil (profilePicture)
+    return this.prisma.user.create({
+      data: { ...data, password: hashPassword, profilePicture: data.profilePicture }, // profilePicture adicionado
+    });
   }
 
   findAll() {
