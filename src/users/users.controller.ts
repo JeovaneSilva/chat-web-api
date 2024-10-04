@@ -18,6 +18,8 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as sharp from 'sharp'; // Importa a biblioteca Sharp
+import * as fs from 'fs'; // Importa o módulo de filesystem do Node.js para deletar arquivos
 
 @Controller('users')
 export class UsersController {
@@ -27,7 +29,7 @@ export class UsersController {
   @UseInterceptors(
     FileInterceptor('profilePicture', {
       storage: diskStorage({
-        destination: './uploads/profile_pictures', // Pasta onde as fotos serão salvas
+        destination: './temp', // Salva a imagem temporariamente em /temp
         filename: (req, file, cb) => {
           // Gerando nome único para o arquivo
           const uniqueSuffix =
@@ -42,8 +44,28 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const profilePicture = file ? file.filename : null; // Verifica se o arquivo foi enviado
-    return this.usersService.create({ ...createUserDto, profilePicture }); // Passa o profilePicture para o service
+    if (file) {
+      const tempFilePath = file.path; // Caminho do arquivo temporário
+      const outputFilePath = `./uploads/profile_pictures/${file.filename}`; // Caminho do arquivo final
+
+      // Redimensiona a imagem para 200x200 pixels e corta para manter o aspecto quadrado
+      await sharp(tempFilePath)
+        .resize(200, 200, {
+          fit: sharp.fit.cover, // Mantém a imagem centralizada e quadrada
+        })
+        .toFile(outputFilePath); // Salva a imagem redimensionada no destino final
+
+      // Deleta o arquivo temporário após o processamento
+      fs.unlinkSync(tempFilePath);
+
+      return this.usersService.create({
+        ...createUserDto,
+        profilePicture: file.filename, // Salva o nome do arquivo redimensionado
+      });
+    }
+
+    // Caso não tenha arquivo de imagem, cria o usuário sem profilePicture
+    return this.usersService.create(createUserDto);
   }
 
   @UseGuards(AuthGuard)

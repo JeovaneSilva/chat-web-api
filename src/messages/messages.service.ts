@@ -21,12 +21,4 @@ export class MessagesService {
       include: { sender: true },
     });
   }
-
-  update(id: number) {
-    
-  }
-
-  remove(id: number) {
-   
-  }
 }
