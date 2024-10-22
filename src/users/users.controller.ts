@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -41,7 +42,7 @@ export class UsersController {
     }),
   )
   async create(
-    @Body() createUserDto: CreateUserDto,
+    @Body(new ValidationPipe()) createUserDto: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {

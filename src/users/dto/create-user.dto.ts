@@ -1,4 +1,4 @@
-import { IsAlpha, IsEmail, IsNotEmpty, IsString, Length, MinLength } from "class-validator"
+import { IsAlpha, IsAlphanumeric, IsEmail, IsNotEmpty, IsString, Length, MinLength } from "class-validator"
 
 
 export class CreateUserDto {
@@ -11,7 +11,7 @@ export class CreateUserDto {
     @MinLength(3,{message:"Nome deve ter no mínimo 3 caracteres"})
     name: string;
 
-    @IsAlpha()
+    @IsAlphanumeric()
     @IsNotEmpty({message: "Senha não pode ser vazio"})
     @MinLength(6,{message:"Senha deve ter no mínimo 6 caracteres"})
     password: string;
