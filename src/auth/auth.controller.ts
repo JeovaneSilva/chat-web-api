@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpCode, HttpStatus, UseGuards, Get, Request } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus, UseGuards, Get, Request, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { AuthGuard } from './auth.guard';
@@ -17,5 +17,19 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.sub;
+  }
+
+  @Post('recuperar-senha')
+  async solicitarRedefinicao(@Body('email') email: string) {
+    return this.authService.solicitarRedefinicaoSenha(email);
+  }
+
+  @Post('redifinirsenha/:token')
+  async redefinirSenha(
+    @Param('token') token: string,
+    @Body('novaSenha') novaSenha: string,
+  ) {
+    
+    return this.authService.redefinirSenha(token, novaSenha);
   }
 }

@@ -18,7 +18,7 @@ export class MessagesService {
   async getMessagesByConversationId(conversationId: number) {
     return this.prisma.message.findMany({
       where: { conversationId },
-      include: { sender: true },
+      include: { user: true },
     });
   }
 }

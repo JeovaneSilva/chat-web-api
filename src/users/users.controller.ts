@@ -30,7 +30,7 @@ export class UsersController {
   @UseInterceptors(
     FileInterceptor('profilePicture', {
       storage: diskStorage({
-        destination: './temp', // Salva a imagem temporariamente em /temp
+        destination: './uploads/profile_pictures', // Salva a imagem temporariamente em /temp
         filename: (req, file, cb) => {
           // Gerando nome único para o arquivo
           const uniqueSuffix =
