@@ -18,9 +18,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import * as sharp from 'sharp'; // Importa a biblioteca Sharp
-import * as fs from 'fs'; // Importa o módulo de filesystem do Node.js para deletar arquivos
+import { extname, join } from 'path';
+import * as sharp from 'sharp';
+import * as fs from 'fs';
 
 @Controller('users')
 export class UsersController {
@@ -30,9 +30,8 @@ export class UsersController {
   @UseInterceptors(
     FileInterceptor('profilePicture', {
       storage: diskStorage({
-        destination: './uploads/profile_pictures', // Salva a imagem temporariamente em /temp
+        destination: './uploads/temp', // Temporário para processamento
         filename: (req, file, cb) => {
-          // Gerando nome único para o arquivo
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
@@ -46,26 +45,22 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
-      const tempFilePath = file.path; // Caminho do arquivo temporário
-      const outputFilePath = `./uploads/profile_pictures/${file.filename}`; // Caminho do arquivo final
+      const tempFilePath = file.path;
+      const outputFilePath = `./uploads/profile_pictures/${file.filename}`;
 
-      // Redimensiona a imagem para 200x200 pixels e corta para manter o aspecto quadrado
       await sharp(tempFilePath)
-        .resize(200, 200, {
-          fit: sharp.fit.cover, // Mantém a imagem centralizada e quadrada
-        })
-        .toFile(outputFilePath); // Salva a imagem redimensionada no destino final
+        .resize(200, 200, { fit: sharp.fit.cover })
+        .toFile(outputFilePath);
 
-      // Deleta o arquivo temporário após o processamento
+      // Deletando arquivo temporário
       fs.unlinkSync(tempFilePath);
 
       return this.usersService.create({
         ...createUserDto,
-        profilePicture: file.filename, // Salva o nome do arquivo redimensionado
+        profilePicture: file.filename,
       });
     }
 
-    // Caso não tenha arquivo de imagem, cria o usuário sem profilePicture
     return this.usersService.create(createUserDto);
   }
 
