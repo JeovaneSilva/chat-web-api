@@ -1,5 +1,5 @@
 export class CreateMessageDto {
-    content: string
+    content: string;
     senderId: number
     conversationId: number
 }

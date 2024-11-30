@@ -70,10 +70,10 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @UseGuards(AuthGuard)
+  
   @Get(':id')
-  async getUser(@Param('id') id: number) {
-    const user = await this.usersService.getUserById(id);
+  async getUser(@Param('id') id: string) {
+    const user = await this.usersService.getUserById(+id);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
