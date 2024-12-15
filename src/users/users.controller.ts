@@ -17,10 +17,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import * as multer from 'multer';
 import * as sharp from 'sharp';
-import * as fs from 'fs';
+import { supabase } from './supabase-client'; // Cliente do Supabase
 
 @Controller('users')
 export class UsersController {
@@ -29,15 +28,7 @@ export class UsersController {
   @Post()
   @UseInterceptors(
     FileInterceptor('profilePicture', {
-      storage: diskStorage({
-        destination: './uploads/temp', // Temporário para processamento
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: multer.memoryStorage(), // Armazena o arquivo na memória
     }),
   )
   async create(
@@ -45,24 +36,45 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
-      const tempFilePath = file.path;
-      const outputFilePath = `./uploads/profile_pictures/${file.filename}`;
+      try {
+        // Redimensiona a imagem usando Sharp
+        const resizedImageBuffer = await sharp(file.buffer)
+          .resize(200, 200, { fit: sharp.fit.cover })
+          .toBuffer();
 
-      await sharp(tempFilePath)
-        .resize(200, 200, { fit: sharp.fit.cover })
-        .toFile(outputFilePath);
+        // Gera um nome único para o arquivo
+        const uniqueFileName = `${Date.now()}-${file.originalname}`;
 
-      // Deletando arquivo temporário
-      fs.unlinkSync(tempFilePath);
+        // Faz o upload para o Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('profile-pictures') // Bucket do Supabase
+          .upload(uniqueFileName, resizedImageBuffer, {
+            contentType: file.mimetype, // Define o tipo MIME
+          });
 
-      return this.usersService.create({
-        ...createUserDto,
-        profilePicture: file.filename,
-      });
+        if (uploadError) {
+          throw new Error(`Erro ao fazer upload para o Supabase: ${uploadError.message}`);
+        }
+
+        // Gera a URL pública da imagem
+        const { publicUrl } = supabase.storage
+          .from('profile-pictures')
+          .getPublicUrl(uniqueFileName).data;
+
+        // Salva os dados do usuário com a URL da imagem no banco
+        return this.usersService.create({
+          ...createUserDto,
+          profilePicture: publicUrl, // Salva a URL pública no banco
+        });
+      } catch (err) {
+        throw new Error(`Erro ao processar imagem: ${err.message}`);
+      }
     }
 
+    // Caso nenhum arquivo seja enviado
     return this.usersService.create(createUserDto);
   }
+
 
   @UseGuards(AuthGuard)
   @Get()

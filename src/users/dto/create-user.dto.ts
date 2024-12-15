@@ -1,4 +1,4 @@
-import { IsAlpha, IsAlphanumeric, IsEmail, IsNotEmpty, IsString, Length, MinLength } from "class-validator"
+import { IsAlpha, IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsString, Length, MinLength } from "class-validator"
 
 
 export class CreateUserDto {
@@ -17,8 +17,11 @@ export class CreateUserDto {
     password: string;
     
     isOnline: boolean
-    profilePicture?:string
-    
+
+    @IsString()
+    @IsOptional()
+    profilePicture?: string;
+        
 
 }
 
