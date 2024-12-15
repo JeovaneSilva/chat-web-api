@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,12 +13,12 @@ model conversation {
   user2Id   Int
   createdAt DateTime  @default(now())
   updatedAt DateTime?
-  user1     user      @relation("conversation_user1IdTouser", fields: [user1Id], references: [id], map: "Conversation_user1Id_fkey")
-  user2     user      @relation("conversation_user2IdTouser", fields: [user2Id], references: [id], map: "Conversation_user2Id_fkey")
+  user1     user      @relation("conversation_user1IdTouser", fields: [user1Id], references: [id], map: "Conversation_user1Id_fkey_uniq")
+  user2     user      @relation("conversation_user2IdTouser", fields: [user2Id], references: [id], map: "Conversation_user2Id_fkey_uniq")
   messages  message[]
 
-  @@index([user1Id], map: "Conversation_user1Id_fkey")
-  @@index([user2Id], map: "Conversation_user2Id_fkey")
+  @@index([user1Id], map: "Conversation_user1Id_index_uniq")
+  @@index([user2Id], map: "Conversation_user2Id_index_uniq")
 }
 
 model invite {
@@ -28,11 +28,11 @@ model invite {
   status     InviteStatus @default(PENDING)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime?
-  receiver   user         @relation("invite_receiverIdTouser", fields: [receiverId], references: [id], map: "Invite_receiverId_fkey")
-  sender     user         @relation("invite_senderIdTouser", fields: [senderId], references: [id], map: "Invite_senderId_fkey")
+  receiver   user         @relation("invite_receiverIdTouser", fields: [receiverId], references: [id], map: "Invite_receiverId_fkey_uniq")
+  sender     user         @relation("invite_senderIdTouser", fields: [senderId], references: [id], map: "Invite_senderId_fkey_uniq")
 
-  @@index([receiverId], map: "Invite_receiverId_fkey")
-  @@index([senderId], map: "Invite_senderId_fkey")
+  @@index([receiverId], map: "Invite_receiverId_index_uniq")
+  @@index([senderId], map: "Invite_senderId_index_uniq")
 }
 
 model message {
@@ -41,11 +41,11 @@ model message {
   senderId       Int
   conversationId Int
   createdAt      DateTime     @default(now())
-  conversation   conversation @relation(fields: [conversationId], references: [id], map: "Message_conversationId_fkey")
-  user           user         @relation(fields: [senderId], references: [id], map: "Message_senderId_fkey")
+  conversation   conversation @relation(fields: [conversationId], references: [id], map: "Message_conversationId_fkey_uniq")
+  user           user         @relation(fields: [senderId], references: [id], map: "Message_senderId_fkey_uniq")
 
-  @@index([conversationId], map: "Message_conversationId_fkey")
-  @@index([senderId], map: "Message_senderId_fkey")
+  @@index([conversationId], map: "Message_conversationId_index_uniq")
+  @@index([senderId], map: "Message_senderId_index_uniq")
 }
 
 model user {
@@ -71,7 +71,7 @@ model userstatus {
   isOnline  Boolean   @default(false)
   lastSeen  DateTime  @default(now())
   updatedAt DateTime?
-  user      user      @relation(fields: [userId], references: [id], map: "UserStatus_userId_fkey")
+  user      user      @relation(fields: [userId], references: [id], map: "UserStatus_userId_fkey_uniq")
 }
 
 enum InviteStatus {
