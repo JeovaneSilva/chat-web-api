@@ -53,7 +53,9 @@ export class UsersController {
           });
 
         if (uploadError) {
-          throw new Error(`Erro ao fazer upload para o Supabase: ${uploadError.message}`);
+          throw new Error(
+            `Erro ao fazer upload para o Supabase: ${uploadError.message}`,
+          );
         }
 
         // Gera a URL pública da imagem
@@ -75,14 +77,12 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-
   @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  
   @Get(':id')
   async getUser(@Param('id') id: string) {
     const user = await this.usersService.getUserById(+id);
