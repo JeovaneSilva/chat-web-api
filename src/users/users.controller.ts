@@ -83,6 +83,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   async getUser(@Param('id') id: string) {
     const user = await this.usersService.getUserById(+id);
