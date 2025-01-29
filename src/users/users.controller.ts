@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Request,
   ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -103,5 +104,23 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  // Rota para atualizar a foto de perfil
+  @UseGuards(AuthGuard)
+  @Patch('updateProfilePicture')
+  @UseInterceptors(
+    FileInterceptor('profilePicture', { storage: multer.memoryStorage() }),
+  )
+  async updateProfilePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: any,
+  ) {
+    if (!file) {
+      throw new Error('Nenhum arquivo enviado.');
+    }
+
+    const userId = req.user.userId; // Obtém o ID do usuário autenticado do token
+    return this.usersService.updateProfilePicture(userId, file);
   }
 }
